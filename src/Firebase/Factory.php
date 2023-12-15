@@ -698,7 +698,7 @@ final class Factory
                 $googleApplicationCredentials = Util::getenv('GOOGLE_APPLICATION_CREDENTIALS');
 
                 if ($googleApplicationCredentials === null) {
-                    return;
+                    return null;
                 }
 
                 if (!str_starts_with($googleApplicationCredentials, '{')) {
