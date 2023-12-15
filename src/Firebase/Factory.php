@@ -142,6 +142,9 @@ final class Factory
         }
 
         if (!str_starts_with($googleApplicationCredentials, '{')) {
+            if($googleApplicationCredentials && file_exists($p = base_path($googleApplicationCredentials)) && $d = Json::decode(file_get_contents($p), true))
+                $this->serviceAccount = $d;
+
             return;
         }
 
@@ -689,7 +692,24 @@ final class Factory
             return $this->googleAuthTokenCredentials;
         }
 
+
         if ($this->serviceAccount !== null) {
+            if (!array_key_exists('client_email', $this->serviceAccount) || !array_key_exists('private_key', $this->serviceAccount)) {
+                $googleApplicationCredentials = Util::getenv('GOOGLE_APPLICATION_CREDENTIALS');
+
+                if ($googleApplicationCredentials === null) {
+                    return;
+                }
+
+                if (!str_starts_with($googleApplicationCredentials, '{')) {
+                    if($googleApplicationCredentials && file_exists($p = base_path($googleApplicationCredentials)) && $d = Json::decode(file_get_contents($p), true)){
+                        $this->serviceAccount = $d;
+                    }
+                }else{
+                    $this->serviceAccount = Json::decode(file_get_contents($googleApplicationCredentials), true);
+                }
+
+            }
             return $this->googleAuthTokenCredentials = new ServiceAccountCredentials(self::API_CLIENT_SCOPES, $this->serviceAccount);
         }
 
